@@ -25,7 +25,7 @@ uv run python scripts/check.py
 
 提交源码、测试样例、依赖锁文件、配置示例及文档。不要提交 `.env`、日志、数据库、会话检查点或运行报告。目录规则见 [data/README.md](data/README.md)。
 
-提交前查看 `git status --short` 和 `git diff --cached`，确认没有凭据或用户数据。一次 PR 尽量围绕一个明确问题，写清变更原因和验证方式。历史记录位于 docs/archive（本地文件，不随仓库提交），当前操作以根 README 为准。
+提交前查看 `git status --short` 和 `git diff --cached`，确认没有凭据或用户数据。一次 PR 尽量围绕一个明确问题，写清变更原因和验证方式。当前操作以根 README 为准。
 
 ## 授权
 
