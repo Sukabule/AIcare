@@ -1,0 +1,5 @@
+[
+  {"query":"订单1001已发货，我不想要了能退吗","order":{"order_id":"1001","status":"已发货","product_name":"猫爬架"},"expect_contains":["退"]},
+  {"query":"订单1002的MH-W40损坏了想换货","order":{"order_id":"1002","status":"已发货","product_name":"MH-W40"},"expect_contains":["MH-W40"]},
+  {"query":"签收后七天内想申请退款，商品未拆封","order":{"order_id":"1001","status":"已发货","product_name":"猫爬架"},"expect_contains":["退款"]}
+]

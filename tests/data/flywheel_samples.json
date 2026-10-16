@@ -1,0 +1,243 @@
+[
+  {
+    "id": "N1",
+    "question": "邮费到底多少啊",
+    "candidates": [
+      {
+        "id": 11,
+        "normalized_question": "配送运费如何计算？"
+      }
+    ],
+    "matched_id": 11,
+    "concepts": [
+      [
+        "运费",
+        "邮费",
+        "配送费用"
+      ]
+    ]
+  },
+  {
+    "id": "N2",
+    "question": "退回去的邮费谁出",
+    "candidates": [
+      {
+        "id": 12,
+        "normalized_question": "退货运费由谁承担？"
+      },
+      {
+        "id": 11,
+        "normalized_question": "配送运费如何计算？"
+      }
+    ],
+    "matched_id": 12,
+    "concepts": [
+      [
+        "退货",
+        "退回"
+      ],
+      [
+        "运费",
+        "邮费"
+      ]
+    ]
+  },
+  {
+    "id": "N3",
+    "question": "能以旧换新不",
+    "candidates": [
+      {
+        "id": 13,
+        "normalized_question": "是否提供以旧换新活动？"
+      }
+    ],
+    "matched_id": 13,
+    "concepts": [
+      [
+        "以旧换新"
+      ]
+    ]
+  },
+  {
+    "id": "N4",
+    "question": "机器寄回去修要等几天啊",
+    "candidates": [
+      {
+        "id": 14,
+        "normalized_question": "寄修的处理时限是多少？"
+      }
+    ],
+    "matched_id": 14,
+    "concepts": [
+      [
+        "维修",
+        "寄修"
+      ],
+      [
+        "多久",
+        "时限",
+        "时间",
+        "几天"
+      ]
+    ]
+  },
+  {
+    "id": "N5",
+    "question": "有没有真人现在能接待我",
+    "candidates": [
+      {
+        "id": 15,
+        "normalized_question": "现在是否有人工客服在线接待？"
+      }
+    ],
+    "matched_id": 15,
+    "concepts": [
+      [
+        "人工客服",
+        "人工服务"
+      ],
+      [
+        "时间",
+        "接待",
+        "在线"
+      ]
+    ]
+  },
+  {
+    "id": "N6",
+    "question": "滤芯几周换一次呀",
+    "candidates": [],
+    "matched_id": null,
+    "concepts": [
+      [
+        "滤芯"
+      ],
+      [
+        "更换",
+        "换"
+      ]
+    ]
+  },
+  {
+    "id": "N7",
+    "question": "这猫架一层能压多重",
+    "candidates": [
+      {
+        "id": 16,
+        "normalized_question": "猫爬架单层承重是多少？"
+      }
+    ],
+    "matched_id": 16,
+    "concepts": [
+      [
+        "猫爬架",
+        "猫架"
+      ],
+      [
+        "承重"
+      ]
+    ]
+  },
+  {
+    "id": "N8",
+    "question": "能给公司开能抵扣的那种票吗",
+    "candidates": [
+      {
+        "id": 17,
+        "normalized_question": "是否支持开具增值税专用发票？"
+      }
+    ],
+    "matched_id": 17,
+    "concepts": [
+      [
+        "专用发票",
+        "专票",
+        "抵扣"
+      ]
+    ]
+  },
+  {
+    "id": "N9",
+    "question": "我想多买一件能改订单数量吗",
+    "candidates": [
+      {
+        "id": 18,
+        "normalized_question": "订单商品数量可以修改吗？"
+      }
+    ],
+    "matched_id": 18,
+    "concepts": [
+      [
+        "订单"
+      ],
+      [
+        "数量"
+      ]
+    ]
+  },
+  {
+    "id": "N10",
+    "question": "养两只猫LP200几天倒一次废砂盒",
+    "candidates": [
+      {
+        "id": 19,
+        "normalized_question": "MH-LP200 多猫家庭废砂盒多久清理一次？"
+      }
+    ],
+    "matched_id": 19,
+    "concepts": [
+      [
+        "LP200"
+      ],
+      [
+        "废砂",
+        "清理"
+      ]
+    ]
+  },
+  {
+    "id": "N11",
+    "question": "你们会回收旧机器折钱吗",
+    "candidates": [
+      {
+        "id": 20,
+        "normalized_question": "会员积分如何兑换？"
+      }
+    ],
+    "matched_id": null,
+    "concepts": [
+      [
+        "回收"
+      ],
+      [
+        "折价",
+        "折钱",
+        "抵扣",
+        "折抵",
+        "折现"
+      ]
+    ]
+  },
+  {
+    "id": "N12",
+    "question": "券一单能塞几张啊",
+    "candidates": [
+      {
+        "id": 21,
+        "normalized_question": "一笔订单最多可以使用几张优惠券？"
+      }
+    ],
+    "matched_id": 21,
+    "concepts": [
+      [
+        "优惠券"
+      ],
+      [
+        "几张",
+        "数量",
+        "多少",
+        "上限"
+      ]
+    ]
+  }
+]

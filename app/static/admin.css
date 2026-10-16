@@ -1,0 +1,2 @@
+/* Legacy asset URL; current pages load workspace.css directly. */
+@import url('/static/workspace.css?v=20261016');

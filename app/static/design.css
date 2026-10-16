@@ -1,0 +1,28 @@
+:root {
+  color-scheme: light;
+  --ink: #24374d;
+  --muted: #63758a;
+  --line: #dde5ee;
+  --green: #16766e;
+  --teal: #16766e;
+  --red: #b03e4a;
+  --error: #b03e4a;
+  --paper: #fff;
+  --canvas: #f3f6fa;
+  --nav: #20334d;
+  --pale: #eaf4f1;
+  --font-ui: "Segoe UI Variable", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+}
+html { font-family: var(--font-ui); color: var(--ink); background: var(--canvas); }
+body { font-family: var(--font-ui); }
+button, input, textarea, select { font-family: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #4f9bce; outline-offset: 4px; }
+::selection { background: #c9e9e2; color: #163d39; }
+button:disabled { cursor: not-allowed; }
+[hidden] { display: none !important; }
+.brand-symbol { width: 36px; height: 36px; flex-shrink: 0; display: grid; place-items: center; border-radius: 11px; background: #bfe8d9; color: #20334d; }
+.brand-symbol svg { width: 25px; height: 25px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,36 @@
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let selectedJob=null, poll=null, busy=new Set();
+async function confirmJob(name){
+  return new Promise(resolve=>{
+    const dialog=document.createElement('dialog');dialog.setAttribute('aria-label','确认作业');
+    dialog.style.cssText='max-width:440px;border:1px solid #b6cfca;border-radius:12px;padding:26px;color:#203c3a';
+    const title=document.createElement('h2');title.textContent=name==='kb-reset'?'清空知识库？':'开始抽取知识？';
+    const text=document.createElement('p');text.textContent=name==='kb-reset'?'将清空知识、暂存问答和向量，此操作不可撤销。聊天与工单保留。':'将调用聊天模型处理历史对话，产生 API 用量。抽出的问答经文本去重后入库。';
+    const actions=document.createElement('div');actions.className='actions';
+    const cancel=document.createElement('button');cancel.textContent='取消';
+    const accept=document.createElement('button');accept.textContent='确认执行';accept.className=name==='kb-reset'?'danger':'primary';
+    function finish(value){dialog.close();dialog.remove();resolve(value);}
+    cancel.onclick=()=>finish(false);accept.onclick=()=>finish(true);dialog.oncancel=e=>{e.preventDefault();finish(false);};
+    actions.append(cancel,accept);dialog.append(title,text,actions);document.body.append(dialog);dialog.showModal();cancel.focus();
+  });
+}
+async function api(path,body){const response=await fetch(path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok){const d=data.detail;throw new Error(typeof d==='string'?d:d?.message||JSON.stringify(d));}return data;}
+function note(id,text,error=false){$(id).textContent=text;$(id).classList.toggle('error',error);}
+function chunkHtml(c){return `<article class="chunk"><span class="tag">${esc(c.content_type||'知识')}</span>${c.is_key_clause?'<span class="tag good">关键条款</span>':''}<h3>${esc(c.questions||c.question)}</h3><small class="muted">${esc(c.section_path||'')}</small><pre>${esc(c.answer)}</pre></article>`;}
+function previewChunks(chunks){$('preview-output').innerHTML=chunks.map(chunkHtml).join('')||'<p class="muted">没有可录入的正文。</p>';$('preview-count').textContent=`（${chunks.length} 块）`;$('preview-details').open=true;}
+async function action(button,output,fn){if(busy.has(button))return;busy.add(button);button.disabled=true;try{await fn();}catch(e){note(output,e.message,true);}finally{button.disabled=false;busy.delete(button);}}
+async function refresh(){try{const o=await api('/api/kb/overview');const d=o.mysql;for(const [id,key] of [['total','total'],['pending','pending'],['done','done'],['key','key_clauses']])$(id).textContent=d?.[key]??'—';$('vectors').textContent=o.milvus??'—';$('consistency').textContent={consistent:'已对齐',pending:'待补齐或核对',unavailable:'读不到'}[o.consistency];note('dependency',[o.mysql_error,o.milvus_error,o.source_error].filter(Boolean).join('；'),Boolean(o.mysql_error||o.milvus_error));$('source-dir').textContent=o.source_dir||'';$('materials').replaceChildren();o.materials.forEach(m=>{const row=document.createElement('div');row.className='material';row.innerHTML=`<div><h3>${esc(m.name)}</h3><small class="muted">${esc(m.content_type)} · ${m.count??0} 块 · ${m.key_clauses??0} 条关键块</small><div>${(m.features||[]).map(f=>`<span class="tag">${esc({table:'表格按行切',recursive:'长文递归切',section:'标题分节'}[f]||f)}</span>`).join('')}</div></div>`;const button=document.createElement('button');button.textContent='预览';button.onclick=()=>{$('document').value=m.text||'';$('kind').value=m.content_type;previewChunks(m.chunks);$('document').scrollIntoView({block:'center'});};row.append(button);$('materials').append(row);});$('recent').innerHTML=d?.recent.map(c=>`<details><summary>#${c.id} ${esc(c.questions)} <span class="tag ${c.vectorize_status==='done'?'good':'pending'}">${esc(c.vectorize_status)}</span></summary>${chunkHtml(c)}</details>`).join('')||'<p class="muted">暂无可读取的知识块。</p>';$('batches').textContent=`${d?.batches??'—'} 批`;$('stage-counts').textContent=d?`待去重 ${d.staging.extracted} / 保留 ${d.staging.kept} / 丢弃 ${d.staging.discarded}`:'MySQL 读不到';$('job-list').replaceChildren();o.jobs.forEach(j=>{const b=document.createElement('button');b.textContent=j.name;b.onclick=()=>selectJob(j.name);$('job-list').append(b);});}catch(e){note('dependency',e.message,true);}}
+function input(){return {text:$('document').value,content_type:$('kind').value};}
+$('preview').onclick=()=>action($('preview'),'ingest-result',async()=>{const r=await api('/api/kb/preview',input());previewChunks(r.chunks);note('ingest-result','预览完成，尚未写入数据库。');});
+$('ingest').onclick=()=>action($('ingest'),'ingest-result',async()=>{note('ingest-result','正在录入，请稍候…');try{const r=await api('/api/kb/ingest',{...input(),vectorize:$('auto-vector').checked});note('ingest-result',`已入库 ${r.inserted} 块，跳过 ${r.skipped} 块${r.vectorized!==undefined?`，向量化 ${r.vectorized} 块`:''}。`);}finally{await refresh();}});
+$('search').onclick=()=>action($('search'),'search-state',async()=>{note('search-state','正在语义检索…');$('hits').replaceChildren();const r=await api('/api/kb/search',{query:$('query').value,top_k:Number($('top-k').value),route:$('route').value,filters:$('filter-kind').value?{content_type:$('filter-kind').value}:{}});note('search-state',`命中 ${r.hits.length} 块 · ${r.route}${r.min_score===null?" · 各路线分数不可直接比较":` · 最低分 ${r.min_score}`}`);$('hits').innerHTML=r.hits.map(h=>`<article class="chunk"><div class="panel-head"><h3>${esc(h.question)}</h3><span class="score">${h.score.toFixed(3)}</span></div><small class="muted">知识块 #${h.id}</small><pre>${esc(h.answer)}</pre></article>`).join('')||'<p class="muted">没有达到阈值的知识，请补充材料或换个问题。</p>';});
+$('query').onkeydown=e=>{if(e.key==='Enter')$('search').click();};
+$('vectorize').onclick=()=>action($('vectorize'),'vector-result',async()=>{note('vector-result','正在处理待补块…');try{const r=await api('/api/kb/vectorize',{});note('vector-result',`已完成 ${r.vectorized} 块。`);}finally{await refresh();}});
+$('staging').onclick=()=>action($('staging'),'dependency',async()=>{const r=await api('/api/kb/staging');$('stage-items').innerHTML=r.items.map(c=>`<div><span class="tag">${esc(c.status)}</span><small>${esc(c.source_ref)}</small>${chunkHtml(c)}</div>`).join('')||'<p class="muted">尚无暂存问答，先添加样例再抽取。</p>';});
+$('refresh').onclick=refresh;
+async function selectJob(name){selectedJob=name;clearTimeout(poll);await pollJob();}
+async function pollJob(){if(!selectedJob)return;try{const j=await api('/api/jobs/'+selectedJob);note('job-state',`${selectedJob} · ${j.status}`);$('job-log').textContent=j.log||'等待日志…';$('stop-job').disabled=j.status!=='running';if(j.status==='running')poll=setTimeout(pollJob,1600);else await refresh();}catch(e){note('job-state',e.message,true);}}
+document.querySelectorAll('[data-job]').forEach(button=>button.onclick=()=>action(button,'job-state',async()=>{const name=button.dataset.job;const heavy=['kb-mine','kb-reset'].includes(name);if(heavy&&!await confirmJob(name))return;await api('/api/jobs/'+name,{confirmed:heavy});await selectJob(name);}));
+$('stop-job').onclick=()=>action($('stop-job'),'job-state',async()=>{await api('/api/jobs/'+selectedJob+'/stop',{});await pollJob();});
+refresh();

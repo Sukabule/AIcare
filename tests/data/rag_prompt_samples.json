@@ -1,0 +1,129 @@
+{
+  "rewrite": [
+    {
+      "query": "那个邮费到底要给多少钱啊",
+      "expect_terms": [
+        "运费"
+      ]
+    },
+    {
+      "query": "MH-W40 的滤芯要多久换一次",
+      "expect_terms": [
+        "MH-W40",
+        "滤芯"
+      ]
+    },
+    {
+      "query": "我攒的那些分能当钱花不",
+      "expect_terms": [
+        "积分"
+      ]
+    },
+    {
+      "query": "MH-W20 和 MH-W60 的水箱差多少",
+      "expect_terms": [
+        "MH-W20",
+        "MH-W60"
+      ]
+    },
+    {
+      "query": "不想退款，我要换货，怎么办",
+      "expect_terms": [
+        "换货"
+      ]
+    }
+  ],
+  "self_check": [
+    {
+      "query": "MH-W40水箱容量是多少",
+      "evidence": [
+        {
+          "question": "MH-W40",
+          "answer": "水箱容量4L"
+        }
+      ],
+      "useful": true
+    },
+    {
+      "query": "支持数字人民币吗",
+      "evidence": [
+        {
+          "question": "支付方式",
+          "answer": "支持支付宝和微信支付"
+        }
+      ],
+      "useful": false
+    },
+    {
+      "query": "可以寄日本吗",
+      "evidence": [
+        {
+          "question": "配送范围",
+          "answer": "港澳台及海外暂不支持配送"
+        }
+      ],
+      "useful": true
+    },
+    {
+      "query": "退款几天到账",
+      "evidence": [
+        {
+          "question": "退款",
+          "answer": "退款原路退回，具体到账时间以平台售后规则为准，平台不承诺具体天数"
+        }
+      ],
+      "useful": true
+    },
+    {
+      "query": "水箱容量和保修期限是多少",
+      "evidence": [
+        {
+          "question": "MH-W40",
+          "answer": "水箱容量4L"
+        }
+      ],
+      "useful": false
+    },
+    {
+      "query": "银卡会员几折",
+      "evidence": [
+        {
+          "question": "会员",
+          "answer": "银卡享9折"
+        },
+        {
+          "question": "会员",
+          "answer": "银卡享95折"
+        }
+      ],
+      "useful": false
+    }
+  ],
+  "direct_answer": [
+    {
+      "query": "你好",
+      "answer": "您好，请问需要什么帮助",
+      "requires_knowledge": false
+    },
+    {
+      "query": "谢谢",
+      "answer": "不客气",
+      "requires_knowledge": false
+    },
+    {
+      "query": "卖活体宠物吗",
+      "answer": "我们不销售活体宠物",
+      "requires_knowledge": true
+    },
+    {
+      "query": "退款几天到账",
+      "answer": "三个工作日到账",
+      "requires_knowledge": true
+    },
+    {
+      "query": "能开纸质发票吗",
+      "answer": "资料不足，请人工核实",
+      "requires_knowledge": true
+    }
+  ]
+}

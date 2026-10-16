@@ -1,0 +1,78 @@
+[
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "猫砂需要定期整盆更换吗？"
+      },
+      {
+        "role": "assistant",
+        "content": "建议每天清理结团，每月整盆更换猫砂并清洁猫砂盆。"
+      }
+    ],
+    "expected": [
+      "每天",
+      "每月"
+    ],
+    "empty": false
+  },
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "宠物梳子怎么保养？"
+      },
+      {
+        "role": "assistant",
+        "content": "每次使用后清理残留毛发，用湿布擦拭后晾干，避免长时间浸泡。"
+      }
+    ],
+    "expected": [
+      "毛发",
+      "晾干"
+    ],
+    "empty": false
+  },
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "订单1001到了吗？"
+      },
+      {
+        "role": "assistant",
+        "content": "演示数据：订单1001正在上海派送。"
+      }
+    ],
+    "expected": [],
+    "empty": true
+  },
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "宇宙尽头是什么？"
+      },
+      {
+        "role": "assistant",
+        "content": "我负责店铺客服，这个问题不在服务范围内。"
+      }
+    ],
+    "expected": [],
+    "empty": true
+  },
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "可以上门安装吗？"
+      },
+      {
+        "role": "assistant",
+        "content": "暂未查到这项政策，请联系人工确认。"
+      }
+    ],
+    "expected": [],
+    "empty": true
+  }
+]

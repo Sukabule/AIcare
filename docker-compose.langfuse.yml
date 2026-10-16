@@ -1,0 +1,126 @@
+# Based on official v3.218.0 compose. Never merge with the application compose.
+name: aicare-langfuse
+x-env: &lf-env
+  NEXTAUTH_URL: http://127.0.0.1:3000
+  DATABASE_URL: postgresql://postgres:${LF_POSTGRES_PASSWORD:?Run init_langfuse.py}@postgres:5432/postgres
+  SALT: ${LF_SALT}
+  ENCRYPTION_KEY: ${LF_ENCRYPTION_KEY}
+  TELEMETRY_ENABLED: "false"
+  CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+  CLICKHOUSE_URL: http://clickhouse:8123
+  CLICKHOUSE_USER: clickhouse
+  CLICKHOUSE_PASSWORD: ${LF_CLICKHOUSE_PASSWORD}
+  CLICKHOUSE_CLUSTER_ENABLED: "false"
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_AUTH: ${LF_REDIS_PASSWORD}
+  REDIS_TLS_ENABLED: "false"
+  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+  LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+  LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LF_MINIO_PASSWORD}
+  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+  LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+  LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LF_MINIO_PASSWORD}
+  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+x-dependencies: &lf-dependencies
+  postgres: {condition: service_healthy}
+  clickhouse: {condition: service_healthy}
+  redis: {condition: service_healthy}
+  minio: {condition: service_healthy}
+services:
+  langfuse-web:
+    image: langfuse/langfuse:3.218.0
+    restart: unless-stopped
+    mem_limit: 2g
+    depends_on: *lf-dependencies
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      <<: *lf-env
+      NODE_OPTIONS: --max-old-space-size=1536
+      HOSTNAME: 0.0.0.0
+      NEXTAUTH_SECRET: ${LF_NEXTAUTH_SECRET}
+      LANGFUSE_INIT_ORG_ID: aicare-local
+      LANGFUSE_INIT_ORG_NAME: AIcare
+      LANGFUSE_INIT_PROJECT_ID: aicare-local-project
+      LANGFUSE_INIT_PROJECT_NAME: AIcare
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL}
+      LANGFUSE_INIT_USER_NAME: AIcare Admin
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/public/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 90s
+  langfuse-worker:
+    image: langfuse/langfuse-worker:3.218.0
+    restart: unless-stopped
+    mem_limit: 1g
+    depends_on: *lf-dependencies
+    environment:
+      <<: *lf-env
+      NODE_OPTIONS: --max-old-space-size=768
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    mem_limit: 512m
+    environment: {POSTGRES_USER: postgres, POSTGRES_DB: postgres, POSTGRES_PASSWORD: "${LF_POSTGRES_PASSWORD}"}
+    volumes: ["lf-postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.8
+    restart: unless-stopped
+    mem_limit: 1536m
+    user: "101:101"
+    environment: {CLICKHOUSE_DB: default, CLICKHOUSE_USER: clickhouse, CLICKHOUSE_PASSWORD: "${LF_CLICKHOUSE_PASSWORD}"}
+    volumes: ["lf-clickhouse:/var/lib/clickhouse", "lf-clickhouse-logs:/var/log/clickhouse-server"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    mem_limit: 256m
+    command: ["redis-server", "--requirepass", "${LF_REDIS_PASSWORD}", "--maxmemory-policy", "noeviction"]
+    environment: {REDIS_AUTH: "${LF_REDIS_PASSWORD}"}
+    volumes: ["lf-redis:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_AUTH\" ping | grep PONG"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+  minio:
+    image: cgr.dev/chainguard/minio
+    restart: unless-stopped
+    mem_limit: 512m
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    environment: {MINIO_ROOT_USER: minio, MINIO_ROOT_PASSWORD: "${LF_MINIO_PASSWORD}"}
+    ports: ["127.0.0.1:9090:9000"]
+    volumes: ["lf-minio:/data"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  lf-postgres:
+  lf-clickhouse:
+  lf-clickhouse-logs:
+  lf-redis:
+  lf-minio:

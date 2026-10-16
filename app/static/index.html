@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIcare · 客服助手</title>
+  <style>
+    :root{color-scheme:light;--ink:#263f47;--muted:#74838a;--teal:#176d68;--pale:#edf5f3;--line:#e4eaeb;--side:#f5f7f8;--error:#b83c45}
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:#fff;font-size:15px}button,textarea{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.5}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #8dc9c0;outline-offset:4px}
+    .app{height:100dvh;display:grid;grid-template-columns:248px minmax(0,1fr)}.sidebar{background:var(--side);padding:32px 22px;display:flex;flex-direction:column;border-right:1px solid var(--line)}.brand{display:flex;align-items:center;gap:11px;margin:0 0 36px 6px}.brand-mark{width:36px;height:36px;background:var(--teal);color:#fff;border-radius:12px 12px 12px 3px;display:grid;place-items:center;font-weight:650;font-size:15px}.brand strong{font-size:25px;letter-spacing:-.9px}.brand small{font-size:11px;color:var(--muted);display:block;margin-top:1px;letter-spacing:2px}
+    .new-chat{border:1px solid #cbdcda;background:#fff;color:var(--teal);border-radius:10px;padding:12px 18px;text-align:left;font-weight:600;display:flex;align-items:center;gap:12px}.plus{font-size:23px;line-height:16px;font-weight:300}.side-label{color:var(--muted);font-size:12px;margin:34px 10px 12px}.examples{display:grid;gap:6px}.examples button{background:none;border:0;color:#526970;text-align:left;padding:12px 10px;border-radius:8px;line-height:1.5}.examples button:hover{background:#e9efef;color:var(--teal)}.example-icon{display:inline-block;width:24px;color:#789792}.side-bottom{margin-top:auto;padding:24px 10px 0;font-size:12px;color:var(--muted);line-height:1.8}.side-bottom a{color:#526970;text-decoration:none}.side-bottom a:hover{text-decoration:underline}.side-note{padding-top:15px;border-top:1px solid var(--line);margin-top:15px}
+    main{min-width:0;display:flex;flex-direction:column;height:100dvh}.topbar{height:76px;flex-shrink:0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 38px}.topbar-title{font-weight:600;font-size:16px}.topbar-title span{color:var(--muted);font-size:12px;font-weight:400;margin-left:12px}.status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.status-dot{height:7px;width:7px;border-radius:50%;background:#47947d}.conversation{flex:1;min-height:0;overflow:auto;scroll-behavior:smooth;padding:0 30px}.thread{max-width:800px;margin:auto;padding:32px 0}.welcome{max-width:710px;margin:clamp(25px,10vh,120px) auto 50px}.welcome-mark{width:58px;height:58px;display:grid;place-items:center;background:var(--pale);border-radius:20px;color:var(--teal);font-size:27px;margin-bottom:26px}.welcome h1{font-size:30px;line-height:1.4;letter-spacing:-.5px;font-weight:600;margin:0 0 14px}.welcome p{color:var(--muted);line-height:1.9;margin:0;max-width:540px}.starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}.starter{background:#fff;border:1px solid var(--line);border-radius:12px;text-align:left;padding:18px 20px;line-height:1.6;color:var(--ink)}.starter:hover{border-color:#96bfb6;background:#fbfdfc}.starter b{display:block;font-size:14px;font-weight:550}.starter span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .message{margin:0 0 28px;max-width:100%;display:flex;gap:13px;align-items:flex-start}.avatar{width:30px;height:30px;border-radius:10px;background:var(--pale);color:var(--teal);display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0}.bot .message-body{min-width:0;padding-top:3px;max-width:calc(100% - 43px)}.message-heading{font-size:12px;font-weight:600;color:#7a8e92;margin-bottom:10px}.user{justify-content:flex-end}.user .message-body{background:var(--pale);border-radius:16px 16px 4px 16px;max-width:85%;padding:13px 18px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.tool-traces{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}.tool-traces:empty{display:none}.tool-badge{display:inline-flex;border:1px solid #e5e9e9;background:#fafbfb;border-radius:6px;padding:3px 8px;font-size:11px;line-height:1.6;color:#78888b;gap:4px}.markdown{line-height:1.85;overflow-wrap:anywhere}.markdown>*:first-child{margin-top:0}.markdown>*:last-child{margin-bottom:0}.markdown p{margin:0 0 12px}.markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{font-size:17px;line-height:1.6;margin:20px 0 10px;font-weight:650}.markdown ul,.markdown ol{padding-left:23px;margin:10px 0 14px}.markdown li{margin:4px 0}.markdown blockquote{border-left:3px solid #b6d5cc;margin:12px 0;padding:4px 16px;color:#627a80;background:#f7faf9}.markdown pre{overflow:auto;background:#f3f6f7;border:1px solid var(--line);border-radius:8px;padding:16px;line-height:1.6;font-size:13px}.markdown code{font-family:Consolas,monospace;background:#f0f4f4;border-radius:4px;padding:2px 5px;font-size:.9em}.markdown pre code{padding:0;background:none}.markdown a{color:var(--teal);text-underline-offset:3px}.markdown hr{border:0;border-top:1px solid var(--line);margin:22px 0}.table-wrap{max-width:100%;overflow:auto;margin:12px 0}.markdown table{border-collapse:collapse;font-size:13px;min-width:260px}.markdown td,.markdown th{border:1px solid var(--line);padding:9px 12px;text-align:left}.markdown th{background:#f5f8f7;font-weight:600}.error{color:var(--error);font-size:13px;margin:10px 0;line-height:1.7}.dots{height:28px;display:flex;align-items:center;gap:5px}.dots span{height:6px;width:6px;border-radius:50%;background:#89a8a1;animation:pulse 1.1s infinite ease-in-out}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}@keyframes pulse{0%,80%,100%{opacity:.4;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+    .composer-wrap{flex-shrink:0;padding:16px 30px 22px;background:#fff}.composer{max-width:800px;margin:auto;border:1px solid #ccdbd8;border-radius:17px;padding:14px 14px 12px 20px;box-shadow:0 5px 22px #244e4510}.composer:focus-within{border-color:#74a79d}.composer textarea{width:100%;resize:none;min-height:48px;max-height:150px;border:0;outline:none!important;line-height:1.7;color:var(--ink);padding:0;background:none}.composer textarea::placeholder{color:#93a19f}.composer-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}.composer-hint{font-size:11px;color:#97a4a4}.send{background:var(--teal);border:0;border-radius:9px;color:white;padding:9px 15px;min-width:70px;font-size:13px}.send:hover:not(:disabled){background:#105e59}.footer-note{text-align:center;max-width:800px;margin:10px auto 0;color:#96a0a3;font-size:11px}.mobile-new{display:none}[hidden]{display:none!important}
+    .sidebar{min-height:0;overflow:hidden}.brand,.new-chat,.examples,.side-bottom{flex-shrink:0}.conversation-list{overflow:auto;min-height:65px;flex:1;display:flex;flex-direction:column;gap:6px}.conversation-list button{width:100%;border:1px solid transparent;background:none;text-align:left;color:#526970;border-radius:9px;padding:11px 10px;line-height:1.5;flex-shrink:0}.conversation-list button:hover{background:#e9efef}.conversation-list button.active{background:#e4f0ec;border-color:#b9d4cb;color:var(--teal)}.conversation-title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.conversation-date{display:inline-block;color:var(--muted);font-size:10px;margin-top:4px}.summary-badge{display:inline-block;margin-left:7px;color:var(--teal);background:#d8eae3;border-radius:4px;font-size:10px;padding:1px 4px}.history-label{margin-top:23px}.history-empty{font-size:12px;color:var(--muted);padding:9px 10px}.side-label{flex-shrink:0}.side-bottom{padding-top:16px}.examples button{padding:7px 10px}
+    @media(width < 780px){.app{grid-template-columns:1fr}.sidebar{display:none}.topbar{height:62px;padding:0 20px}.topbar-title span{display:none}.mobile-new{display:block;border:1px solid var(--line);border-radius:7px;background:white;color:var(--teal);padding:7px 10px;font-size:12px}.status{display:none}.conversation{padding:0 19px}.thread{padding-top:24px}.welcome{margin:38px 0}.welcome h1{font-size:25px}.starter-grid{gap:8px;margin-top:25px}.starter{padding:13px}.composer-wrap{padding:10px 14px 15px}.composer-hint{font-size:10px}.footer-note{font-size:10px}.user .message-body{max-width:90%}.message{gap:10px}.bot .message-body{max-width:calc(100% - 40px)}}
+    @media(prefers-reduced-motion:reduce){.dots span{animation:none}.conversation{scroll-behavior:auto}}
+  .citation{border:0;background:#e4f2ee;color:#176d68;border-radius:4px;padding:0 5px;font-size:11px;vertical-align:super}.feedback{display:flex;align-items:center;gap:10px;margin-top:14px;color:#74838a;font-size:12px}.feedback button{border:1px solid #dce6e3;background:white;border-radius:6px;padding:5px 9px}.feedback button.selected{background:#e4f2ee;border-color:#176d68;opacity:1}.source-dialog{width:min(650px,90vw);max-height:80vh;border:1px solid #cbdcda;border-radius:12px;padding:24px;color:#263f47}.source-dialog pre{white-space:pre-wrap;line-height:1.8;font:inherit}.source-dialog::backdrop{background:#183c4566}.suggested-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.suggested-actions button,.ticket-controls button{border:1px solid #cbdcda;border-radius:8px;padding:8px 14px;background:#f2f8f5;color:#176d68;cursor:pointer}.suggested-actions button:disabled{opacity:.5;cursor:default}.suggested-actions span{font-size:12px;color:#74838a}.ticket-dialog label{display:block;margin:18px 0;color:#344f56}.ticket-dialog select,.ticket-dialog textarea{display:block;box-sizing:border-box;width:100%;margin-top:8px;border:1px solid #cad8d5;border-radius:8px;padding:10px;font:inherit}.ticket-controls{display:flex;justify-content:flex-end;gap:12px}</style>
+<style>.ticket-preview{border:1px solid #b6cfca;border-left:3px solid #176d68;border-radius:10px;padding:18px;background:#f5faf7}.ticket-preview>strong{color:#176d68;font-size:15px}.ticket-preview p{font-size:13px;line-height:1.7;margin:10px 0}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere;color:#263f47}.ticket-controls .confirm-submit{background:#176d68;color:white;border-color:#176d68}.ticket-controls button:disabled{opacity:.5;cursor:default}</style>
+<link rel="stylesheet" href="/static/chat.css?v=20261014">
+</head>
+<style>.order-picker{display:grid;gap:9px;margin-top:14px}.order-picker>p{margin:0 0 3px;color:#61767b;font-size:13px}.order-card{display:grid;grid-template-columns:1fr auto;gap:6px 12px;text-align:left;border:1px solid #cbdcda;border-radius:10px;padding:13px 16px;background:#f7faf8;color:#263f47;cursor:pointer}.order-card:hover{border-color:#176d68;background:#edf5f0}.order-card small{color:#74838a}.order-card:disabled{opacity:.6;cursor:default}.ticket-dialog input{display:block;box-sizing:border-box;width:100%;margin-top:8px;border:1px solid #cad8d5;border-radius:8px;padding:10px;font:inherit;background:#f5f7f6}.refund-note{font-size:13px;color:#74838a}</style>
+<body class="chat-page">
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 14V5l8 5h4l8-5v9c4 13-24 13-20 0Z" fill="currentColor"/><path d="M11 17h2m6 0h2m-6 4h2" stroke="#bfe8d9" stroke-width="2.5" stroke-linecap="round"/></svg></div><div><strong>AIcare</strong><small>客服助手</small></div></div>
+    <button class="new-chat" data-new><span class="plus">+</span>新对话</button>
+    <div class="side-label history-label">会话记录</div>
+    <nav id="conversationList" class="conversation-list" aria-label="历史会话"><span class="history-empty">暂无会话记录</span></nav>
+    <div class="side-label">你可以这样问</div>
+    <div class="examples">
+      <button data-prompt="订单 1001 的物流到哪了"><span class="example-icon">□</span>订单 1001 的物流到哪了</button>
+      <button data-prompt="退货政策是什么"><span class="example-icon">↶</span>退货政策是什么</button>
+      <button data-prompt="邮费是多少"><span class="example-icon">▱</span>邮费是多少</button>
+    </div>
+    <div class="side-bottom"><a href="/admin">管理工作台</a> · <a href="/kb">知识库</a><br><a href="/docs" target="_blank" rel="noopener">接口文档</a><div class="side-note">订单、商品和物流使用演示数据。<br>政策与常见问题通过知识库语义检索。</div></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="topbar-title">客服对话 <span>商品 · 订单 · 售后</span></div><div class="status"><span class="status-dot"></span>AIcare 助手</div><button class="mobile-new" data-new>＋ 新对话</button></header>
+    <section class="conversation" id="scrollArea" aria-label="客服聊天记录">
+      <div class="welcome" id="welcome"><div class="welcome-mark"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M13 29V9l15 10h8L51 9v20c8 29-46 29-38 0Z" fill="#d2e9dc" stroke="#20334d" stroke-width="2.5" stroke-linejoin="round"/><path d="M22 35h4m12 0h4m-13 8h6" stroke="#20334d" stroke-width="3" stroke-linecap="round"/><path d="M8 38h10m28 0h10M9 45l9-3m28 0 9 3" stroke="#20334d" stroke-width="1.5" stroke-linecap="round"/></svg></div><h1>你好，今天想解决什么问题？</h1><p>想查查订单到哪了，了解商品信息，或处理售后问题？<br>把你的问题告诉我，我们从这里开始。</p><div class="starter-grid"><button class="starter" data-prompt="订单 1001 的物流到哪了"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h11v12H3zM14 9h4l3 4v4h-7M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>查询订单物流</b><span>订单 1001 现在到哪了？</span></button><button class="starter" data-prompt="退货政策是什么"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10a7 7 0 1 1-6 11M4 7l4-4M4 7l4 4"/></svg>退换货与售后</b><span>收到的商品可以退吗？</span></button><button class="starter" data-prompt="邮费是多少"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg>运费与配送</b><span>满多少钱包邮？</span></button><button class="starter" data-prompt="MH-W40 饮水机的水箱多大"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m12 3 9 5v9l-9 5-9-5V8zm0 9L3 8m9 4 9-4m-9 4v10"/></svg>了解商品</b><span>饮水机容量、功能怎么选？</span></button></div></div>
+      <div class="thread" id="thread" role="log" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+    <div class="composer-wrap"><form class="composer" id="chatForm"><label for="message" hidden>输入客服问题</label><textarea id="message" rows="2" maxlength="32000" placeholder="输入你的问题，也可以附上订单号…" aria-label="输入客服问题"></textarea><div class="composer-bar"><span class="composer-hint">Enter 发送，Shift + Enter 换行</span><button class="send" id="send" type="submit">发送 ↑</button></div></form><div class="footer-note">请勿发送密码、验证码或完整支付信息。</div></div>
+  </main>
+</div>
+<script>
+'use strict';
+const storage = {get(key){try{return localStorage.getItem(key)}catch{return null}},set(key,value){try{localStorage.setItem(key,value)}catch{}},remove(key){try{localStorage.removeItem(key)}catch{}}};
+const keys = {user:'aicare.user_id',conversation:'aicare.conversation_id',messages:'aicare.messages'};
+const userId = storage.get(keys.user) || crypto.randomUUID(); storage.set(keys.user,userId);
+let conversationId = Number(storage.get(keys.conversation)) || null;
+let history = []; try{const saved=JSON.parse(storage.get(keys.messages)||'[]');if(Array.isArray(saved))history=saved.filter(x=>x&&['user','assistant'].includes(x.role)&&typeof x.text==='string').slice(-100)}catch{}
+const thread=document.getElementById('thread'), input=document.getElementById('message'), scrollArea=document.getElementById('scrollArea'), send=document.getElementById('send'), welcome=document.getElementById('welcome');
+let busy=false;
+const views=new WeakMap();
+const escapeHtml = value => String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function inline(value){
+  const codes=[];
+  let text=escapeHtml(value).replace(/`([^`]+)`/g,(_,code)=>{codes.push('<code>'+code+'</code>');return '\u0000'+(codes.length-1)+'\u0000'});
+  text=text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,(_,label,url)=>'<a href="'+url+'" target="_blank" rel="noopener noreferrer">'+label+'</a>');
+  text=text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  return text.replace(/\u0000(\d+)\u0000/g,(_,i)=>codes[Number(i)]||'');
+}
+function markdown(source){
+  const lines=source.replace(/\r\n?/g,'\n').split('\n');let out='',i=0;
+  const cells=line=>line.trim().replace(/^\||\|$/g,'').split('|').map(x=>x.trim());
+  const tableRule=line=>/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+  while(i<lines.length){
+    const line=lines[i];if(!line.trim()){i++;continue}
+    if(/^\s*```/.test(line)){const code=[];i++;while(i<lines.length&&!/^\s*```/.test(lines[i]))code.push(lines[i++]);if(i<lines.length)i++;out+='<pre><code>'+escapeHtml(code.join('\n'))+'</code></pre>';continue}
+    const heading=line.match(/^(#{1,6})\s+(.+)$/);if(heading){const n=heading[1].length;out+='<h'+n+'>'+inline(heading[2])+'</h'+n+'>';i++;continue}
+    if(/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)){out+='<hr>';i++;continue}
+    if(i+1<lines.length&&line.includes('|')&&tableRule(lines[i+1])){const headers=cells(line);out+='<div class="table-wrap"><table><thead><tr>'+headers.map(x=>'<th>'+inline(x)+'</th>').join('')+'</tr></thead><tbody>';i+=2;while(i<lines.length&&lines[i].includes('|')&&lines[i].trim()){out+='<tr>'+cells(lines[i++]).map(x=>'<td>'+inline(x)+'</td>').join('')+'</tr>'}out+='</tbody></table></div>';continue}
+    if(/^>\s?/.test(line)){const quote=[];while(i<lines.length&&/^>\s?/.test(lines[i]))quote.push(lines[i++].replace(/^>\s?/,''));out+='<blockquote>'+quote.map(inline).join('<br>')+'</blockquote>';continue}
+    const list=line.match(/^\s*(?:([-+*])|(\d+)[.)])\s+(.+)$/);if(list){const ordered=!!list[2],tag=ordered?'ol':'ul';out+='<'+tag+'>';while(i<lines.length){const m=lines[i].match(/^\s*(?:([-+*])|(\d+)[.)])\s+(.+)$/);if(!m||!!m[2]!==ordered)break;out+='<li>'+inline(m[3])+'</li>';i++}out+='</'+tag+'>';continue}
+    out+='<p>'+inline(line)+'</p>';i++;
+  }return out;
+}
+function stick(){scrollArea.scrollTop=scrollArea.scrollHeight}
+function persist(){storage.set(keys.messages,JSON.stringify(history.slice(-100)))}
+
+let conversationRows=[], listRequest=0;
+const conversationList=document.getElementById('conversationList');
+async function readConversationData(url){
+  const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),5000);
+  try{const response=await fetch(url,{signal:controller.signal});return response.ok?await response.json():null;}
+  finally{clearTimeout(deadline);}
+}
+function renderConversations(){
+  conversationList.replaceChildren();
+  if(!conversationRows.length){const empty=document.createElement('span');empty.className='history-empty';empty.textContent='暂无会话记录';conversationList.append(empty);return;}
+  for(const row of conversationRows){
+    const button=document.createElement('button');button.type='button';button.className=row.id===conversationId?'active':'';button.disabled=busy;button.setAttribute('aria-current',row.id===conversationId?'true':'false');
+    const title=document.createElement('span');title.className='conversation-title';title.textContent=row.preview||'新对话';button.title=title.textContent;
+    const date=document.createElement('span');date.className='conversation-date';date.textContent=(row.created_at||'').slice(0,16).replace('T',' ');button.append(title,date);
+    if(row.has_summary){const badge=document.createElement('span');badge.className='summary-badge';badge.textContent='已摘要';button.append(badge);}
+    button.onclick=()=>openConversation(row.id);conversationList.append(button);
+  }
+}
+async function refreshConversations(){
+  const version=++listRequest;
+  try{const rows=await readConversationData('/api/conversations?user_id='+encodeURIComponent(userId));if(version!==listRequest||!Array.isArray(rows))return;
+    conversationRows=rows.filter(row=>Number.isSafeInteger(row.id)&&row.id>0);renderConversations();
+  }catch{} // History is optional; a failed read must not block chat.
+}
+async function openConversation(cid){
+  if(busy||!Number.isSafeInteger(cid)||cid<1)return;setBusy(true);
+  try{const rows=await readConversationData('/api/conversations/'+cid+'/messages');if(!Array.isArray(rows))return;const restored=[];let tools=[],preamble='';
+    for(const row of rows){
+      if(!['user','assistant'].includes(row.role))continue;
+      if(row.role==='user'){tools=[];preamble='';}
+      if(row.role==='assistant'&&Array.isArray(row.tool_calls)&&row.tool_calls.length){tools.push(...row.tool_calls.map(call=>call.name));if(typeof row.content==='string'&&row.content)preamble+=row.content+'\n\n';continue;}
+      if(typeof row.content!=='string'||!row.content)continue;
+      restored.push({role:row.role,text:row.role==='assistant'?preamble+row.content:row.content,conversation_id:cid,tools:row.role==='assistant'?[...new Set(tools)]:[]});preamble='';
+    }
+    conversationId=cid;history=restored;storage.set(keys.conversation,String(cid));persist();thread.replaceChildren();
+    for(const item of history)createBubble(item);welcome.hidden=history.length>0;renderConversations();stick();
+  }catch{}finally{setBusy(false);input.focus();}
+}
+
+function showSource(citation){
+  const dialog=document.createElement('dialog');dialog.className='source-dialog';dialog.setAttribute('aria-label','引用原文');
+  const title=document.createElement('h2');title.textContent=`[${citation.number}] ${citation.section_path||citation.question||'知识来源'}`;
+  const meta=document.createElement('p');meta.textContent=`知识块 #${citation.id}`;
+  const text=document.createElement('pre');text.textContent=citation.answer||'';
+  const close=document.createElement('button');close.textContent='关闭';close.onclick=()=>dialog.close();
+  dialog.addEventListener('close',()=>dialog.remove());dialog.append(title,meta,text,close);document.body.append(dialog);dialog.showModal();close.focus();
+}
+function renderAnswer(view,item){
+  view.content.innerHTML=markdown(item.text);
+  const map=new Map((item.citations||[]).map(c=>[Number(c.number),c]));
+  const walker=document.createTreeWalker(view.content,NodeFilter.SHOW_TEXT),nodes=[];
+  while(walker.nextNode())if(!walker.currentNode.parentElement.closest('a,code,pre,button'))nodes.push(walker.currentNode);
+  nodes.forEach(node=>{const text=node.textContent;const matches=[...text.matchAll(/\[(\d+)\]/g)].filter(m=>map.has(Number(m[1])));if(!matches.length)return;
+    const fragment=document.createDocumentFragment();let end=0;matches.forEach(m=>{fragment.append(document.createTextNode(text.slice(end,m.index)));const button=document.createElement('button');button.className='citation';button.textContent=m[0];button.setAttribute('aria-label','查看引用 '+m[1]);button.onclick=()=>showSource(map.get(Number(m[1])));fragment.append(button);end=m.index+m[0].length;});fragment.append(document.createTextNode(text.slice(end)));node.replaceWith(fragment);
+  });
+}
+function renderFeedback(view,item){
+  view.feedback.replaceChildren();if(!item.text||item.error)return;
+  ['👍','👎'].forEach(value=>{const button=document.createElement('button');button.textContent=value;button.setAttribute('aria-label',value==='👍'?'满意':'不满意');button.disabled=Boolean(item.feedback);button.classList.toggle('selected',item.feedback===value);button.onclick=()=>{if(item.feedback)return;item.feedback=value;renderFeedback(view,item);persist();
+    const position=history.indexOf(item);let question='';for(let i=position-1;i>=0;i--){if(history[i].role==='user'){question=history[i].text;break;}}
+    if(item.conversation_id&&question)fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversation_id:item.conversation_id,rating:value==='👍'?'up':'down',question})}).catch(()=>{});
+  };view.feedback.append(button);});
+  if(item.feedback){const label=document.createElement('span');label.textContent='已反馈';view.feedback.append(label);}
+}
+
+function renderActions(view,item){
+  view.actions.replaceChildren();
+  for(const action of (item.actions||[])){
+    if(!['transfer_human','create_ticket','refund_form'].includes(action.type))continue;
+    const button=document.createElement('button');button.type='button';
+    button.textContent=action.type==='transfer_human'?'转人工':action.type==='refund_form'?'提交退款工单':'建工单';
+    button.disabled=action.type==='transfer_human'?Boolean(item.transferred):Boolean(action.type==='refund_form'?item.refundNo:item.ticketNo)||!item.conversation_id;
+    button.onclick=()=>{
+      if(action.type==='transfer_human'){
+        item.transferred=true;renderActions(view,item);
+        const greeting={role:'assistant',text:'您好，我是客服小猫，请问有什么可以帮您的',simulated:true};
+        history.push(greeting);createBubble(greeting);persist();stick();
+      }else if(action.type==='refund_form')refundForm(view,item,action.draft);else ticketForm(view,item);
+    };
+    view.actions.append(button);
+  }
+  if(item.ticketNo){const note=document.createElement('span');note.textContent='工单已创建 '+item.ticketNo;view.actions.append(note);}
+  if(item.refundNo){const note=document.createElement('span');note.textContent='退款工单已提交 '+item.refundNo+' · 待处理';view.actions.append(note);}
+  if(item.transferred){const note=document.createElement('span');note.textContent='已转接人工客服';view.actions.append(note);}
+}
+function refundForm(view,item,draft){
+  const dialog=document.createElement('dialog');dialog.className='source-dialog ticket-dialog';
+  dialog.innerHTML='<form><h2>提交退款工单</h2><p class="refund-note">提交后由客服处理申请，当前不会执行退款。</p><label>订单号<input name="order_id" readonly></label><label>退款原因<select name="reason" required><option value="">请选择退款原因</option><option>七天无理由</option><option>质量问题</option><option>发错货</option><option>不想要了</option><option>其他</option></select></label><p role="alert" class="error" hidden></p><div class="ticket-controls"><button type="button" data-cancel>取消</button><button type="submit">提交退款工单</button></div></form>';
+  const form=dialog.querySelector('form'),alert=form.querySelector('[role="alert"]'),submit=form.querySelector('[type="submit"]');let sending=false;
+  form.elements.order_id.value=draft.order_id;
+  const close=()=>{if(!sending)dialog.close()};dialog.addEventListener('close',()=>dialog.remove());
+  dialog.querySelector('[data-cancel]').onclick=close;dialog.addEventListener('cancel',e=>{e.preventDefault();close()});
+  form.onsubmit=async e=>{e.preventDefault();if(!form.reportValidity())return;sending=true;submit.disabled=true;alert.hidden=true;
+    try{const response=await fetch('/api/actions/create-refund',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversation_id:item.conversation_id,order_id:draft.order_id,reason:form.elements.reason.value})});
+      const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'提交未确认成功，请联系人工核实。');
+      item.refundNo=data.ticket_no;renderActions(view,item);persist();sending=false;close();
+    }catch(error){alert.textContent=error.message;alert.hidden=false;sending=false;submit.disabled=false;}
+  };
+  document.body.append(dialog);dialog.showModal();form.elements.reason.focus();
+}
+function renderOrders(view,item){
+  view.orders.replaceChildren();if(!item.interrupt)return;
+  if(item.interrupt.kind==='confirm_ticket'){renderTicketConfirmation(view,item);return;}
+  const label=document.createElement('p');label.textContent=item.orderSelected?'已选择订单 '+item.orderSelected:item.expired?'这轮订单选择已结束':'请选择要申请退款或售后的订单（演示数据）';view.orders.append(label);
+  for(const order of item.interrupt.orders){const card=document.createElement('button');card.type='button';card.className='order-card';
+    const name=document.createElement('strong');name.textContent=order.product_name;const amount=document.createElement('strong');amount.textContent='¥'+order.amount;
+    const id=document.createElement('small');id.textContent='订单 '+order.order_id;const status=document.createElement('small');status.textContent=order.status;
+    card.append(name,amount,id,status);card.disabled=Boolean(item.orderSelected||item.expired)||item.conversation_id!==conversationId;
+    card.onclick=async()=>{if(busy||item.orderSelected||item.expired)return;setBusy(true);view.orders.querySelectorAll('button').forEach(b=>b.disabled=true);view.dots.hidden=false;view.error.hidden=true;item.error='';
+      await consumeStream('/api/actions/resume',{conversation_id:item.conversation_id,order_id:order.order_id,interrupt_id:item.interrupt.interrupt_id},view,item);
+      if(!item.error){item.orderSelected=order.order_id;renderOrders(view,item);persist();}else renderOrders(view,item);
+    };view.orders.append(card);
+  }
+}
+function renderTicketConfirmation(view,item){
+  const preview=item.interrupt.preview||{},card=document.createElement('section');card.className='ticket-preview';
+  const heading=document.createElement('strong');heading.textContent='工单提交前确认';
+  const type=document.createElement('p');type.textContent='工单类型 · '+String(preview.ticket_type||'');
+  const description=document.createElement('p');description.className='ticket-description';description.textContent=String(preview.description||'');
+  const status=document.createElement('p');status.className='refund-note';
+  status.textContent=item.expired?'这张确认卡已失效，请重新发送问题。':item.ticketDecision===true?'已确认提交':item.ticketDecision===false?'已取消，本次没有创建工单':item.ticketSubmitting?'正在处理，请稍候…':'确认后才会创建工单。';
+  const controls=document.createElement('div');controls.className='ticket-controls';
+  for(const [confirmed,label] of [[false,'取消'],[true,'确认提交']]){const button=document.createElement('button');button.type='button';button.textContent=label;
+    if(confirmed)button.className='confirm-submit';
+    button.disabled=item.ticketDecision!==undefined||!!item.ticketSubmitting||!!item.expired||busy||item.conversation_id!==conversationId;
+    button.onclick=async()=>{if(busy||item.ticketDecision!==undefined||item.ticketSubmitting||item.expired)return;
+      item.ticketSubmitting=true;item.error='';view.error.hidden=true;setBusy(true);renderOrders(view,item);view.dots.hidden=false;
+      await consumeStream('/api/actions/resume',{conversation_id:item.conversation_id,confirmed,interrupt_id:item.interrupt.interrupt_id},view,item);
+      item.ticketSubmitting=false;if(!item.error)item.ticketDecision=confirmed;else item.expired=true;
+      renderOrders(view,item);persist();};controls.append(button);}
+  card.append(heading,type,description,status,controls);view.orders.append(card);
+}
+function ticketForm(view,item){
+  const dialog=document.createElement('dialog');dialog.className='source-dialog ticket-dialog';
+  dialog.innerHTML='<form><h2>创建反馈工单</h2><label>反馈类别<select name="ticket_type" required><option value="">请选择类别</option><option>售后</option><option>投诉</option><option>咨询</option></select></label><label>反馈描述<textarea name="description" required maxlength="4000" rows="5" placeholder="请描述您遇到的问题"></textarea></label><p role="alert" class="error" hidden></p><div class="ticket-controls"><button type="button" data-cancel>取消</button><button type="submit">提交工单</button></div></form>';
+  const form=dialog.querySelector('form'),alert=dialog.querySelector('[role="alert"]'),submit=form.querySelector('[type="submit"]');let sending=false;
+  function close(){if(!sending){dialog.close();dialog.remove();}}
+  dialog.querySelector('[data-cancel]').onclick=close;
+  dialog.addEventListener('click',event=>{if(event.target===dialog)close();});
+  dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();const category=form.elements.ticket_type.value,description=form.elements.description.value.trim();
+    if(!category||!description){alert.hidden=false;alert.textContent='请选择反馈类别并填写反馈描述。';return;}
+    sending=true;submit.disabled=true;alert.hidden=true;
+    try{
+      const response=await fetch('/api/actions/create-ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversation_id:item.conversation_id,ticket_type:category,description})});
+      const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'工单提交未确认成功，请核实后再尝试。');
+      item.ticketNo=data.ticket_no;renderActions(view,item);persist();sending=false;close();
+    }catch(error){alert.hidden=false;alert.textContent=error.message;sending=false;submit.disabled=false;}
+  });
+  document.body.append(dialog);dialog.showModal();form.elements.ticket_type.focus();
+}
+function createBubble(item,waiting=false){
+  const article=document.createElement('article');article.className='message '+(item.role==='user'?'user':'bot');
+  if(item.role==='user'){const body=document.createElement('div');body.className='message-body';body.textContent=item.text;article.append(body);thread.append(article);return {article}}
+  const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent='ai';
+  const body=document.createElement('div');body.className='message-body';
+  const heading=document.createElement('div');heading.className='message-heading';heading.textContent='AIcare';
+  const tools=document.createElement('div');tools.className='tool-traces';
+  const content=document.createElement('div');content.className='markdown';
+  const dots=document.createElement('div');dots.className='dots';dots.setAttribute('aria-label','正在查询，请稍候');dots.innerHTML='<span></span><span></span><span></span>';
+  const error=document.createElement('div');error.className='error';error.setAttribute('role','alert');error.hidden=true;
+  const feedback=document.createElement('div');feedback.className='feedback';body.append(heading,tools,content,dots,error,feedback);article.append(avatar,body);thread.append(article);
+  const actions=document.createElement('div');actions.className='suggested-actions';body.append(actions);
+  const orders=document.createElement('div');orders.className='order-picker';body.append(orders);
+  const view={article,content,tools,dots,error,feedback,actions,orders};views.set(item,view);renderActions(view,item);renderOrders(view,item);
+  for(const name of (Array.isArray(item.tools)?item.tools:[]))addTool(view,name);
+  renderAnswer(view,item);if(!waiting)renderFeedback(view,item);dots.hidden=!waiting||!!item.text;
+  if(item.error){error.hidden=false;error.textContent=item.error}
+  return view;
+}
+function addTool(view,name){const badge=document.createElement('span');badge.className='tool-badge';badge.textContent='🔧 调用了 '+String(name);view.tools.append(badge)}
+function setBusy(value){busy=value;send.disabled=value;input.disabled=value;send.textContent=value?'处理中…':'发送 ↑';document.querySelectorAll('[data-new],[data-prompt],#conversationList button').forEach(button=>button.disabled=value)}
+function reset(){if(busy)return;conversationId=null;history=[];storage.remove(keys.conversation);storage.remove(keys.messages);thread.replaceChildren();welcome.hidden=false;scrollArea.scrollTop=0;input.value='';renderConversations();input.focus()}
+async function streamChat(message){
+  if(busy||!message.trim())return;welcome.hidden=true;setBusy(true);input.value='';
+  const user={role:'user',text:message},assistant={role:'assistant',text:'',tools:[]};history.push(user,assistant);createBubble(user);const view=createBubble(assistant,true);stick();
+  for(const item of history){if(item!==assistant){item.expired=true;item.actions=[];if(views.has(item)){renderOrders(views.get(item),item);renderActions(views.get(item),item)}}}
+  await consumeStream('/api/chat',{user_id:userId,message,conversation_id:conversationId},view,assistant);
+}
+async function consumeStream(url,body,view,assistant){
+  const controller=new AbortController();const deadline=setTimeout(()=>controller.abort(),300000);let receivedDone=false,sentinel=false,paused=false;let reader;
+  const remember=value=>{if(!Number.isSafeInteger(value.conversation_id)||value.conversation_id<1)throw new Error('会话编号无效，请新建对话。');conversationId=value.conversation_id;assistant.conversation_id=conversationId;storage.set(keys.conversation,String(conversationId))};
+  function frame(raw){
+    let event='message';const data=[];for(const line of raw.split(/\r?\n/)){if(line.startsWith('event:'))event=line.slice(6).trim();else if(line.startsWith('data:'))data.push(line.slice(5).trimStart())}
+    if(!data.length)return;const text=data.join('\n');if(text==='[DONE]'){sentinel=true;return}const value=JSON.parse(text);
+    if(event==='error'){if(value.code==='invalid_resume')assistant.expired=true;throw new Error(value.message||'请求未完成，请稍后重试。')}
+    const atBottom=scrollArea.scrollHeight-scrollArea.scrollTop-scrollArea.clientHeight<120;
+    if(value.event==='tool'){assistant.tools.push(value.name);addTool(view,value.name)}
+    if(value.event==='actions'){assistant.actions=value.items;renderActions(view,assistant)}
+    if(value.event==='citations'){assistant.citations=value.citations;renderAnswer(view,assistant)}
+    if(value.event==='interrupt'&&['select_order','confirm_ticket'].includes(value.kind)){remember(value);assistant.interrupt=value;paused=true;view.dots.hidden=true;renderOrders(view,assistant);persist()}
+    if(typeof value.delta==='string'&&value.delta){assistant.text+=value.delta;view.dots.hidden=true;renderAnswer(view,assistant)}
+    if(value.event==='done'){remember(value);renderActions(view,assistant);receivedDone=true}
+    if(atBottom)stick();
+  }
+  try{
+    const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
+    if(!response.ok){throw new Error(response.status===422?'输入格式不正确，请检查内容后重试。':'服务暂时不可用，请稍后重试。')}
+    if(!response.headers.get('content-type')?.includes('text/event-stream')||!response.body)throw new Error('未收到流式响应，请稍后重试。');
+    reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
+    while(true){const {value,done}=await reader.read();buffer+=done?decoder.decode():decoder.decode(value,{stream:true});let match;while((match=/\r?\n\r?\n/.exec(buffer))!==null){const raw=buffer.slice(0,match.index);buffer=buffer.slice(match.index+match[0].length);frame(raw)}if(done)break}
+    if(buffer.trim())frame(buffer);if((!receivedDone&&!paused)||!sentinel)throw new Error('连接提前结束，回复可能不完整，请核实后再发送。');
+  }catch(error){assistant.error=error.name==='AbortError'?'等待响应超时，请稍后重试。':error.message;view.error.textContent=assistant.error;view.error.hidden=false;if(reader)await reader.cancel().catch(()=>{})}
+  finally{clearTimeout(deadline);view.dots.hidden=true;renderFeedback(view,assistant);setBusy(false);if(assistant.interrupt?.kind==='confirm_ticket')renderOrders(view,assistant);persist();input.focus();refreshConversations()}
+}
+document.getElementById('chatForm').addEventListener('submit',event=>{event.preventDefault();streamChat(input.value.trim())});
+input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();streamChat(input.value.trim())}});
+document.querySelectorAll('[data-new]').forEach(button=>button.addEventListener('click',reset));
+document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>streamChat(button.dataset.prompt)));
+for(const item of history)createBubble(item);welcome.hidden=history.length>0;if(history.length)stick();
+refreshConversations();
+if(conversationId&&!history.some(item=>item.interrupt&&!item.orderSelected&&!item.expired))openConversation(conversationId);
+setInterval(()=>{if(!busy&&!document.hidden)refreshConversations()},15000);
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "refund-damaged",
+    "text": "我上周买的猫爬架，订单号 MH20260701123，到货就散架了，我要退款",
+    "expected": {"order_id": "MH20260701123", "request_type": "退款", "expected_solution": "商品到货损坏，要求退款"},
+    "solution_keywords": [["损坏", "散架"], ["退款"]]
+  },
+  {
+    "id": "exchange",
+    "text": "订单 EX20260701002 的猫窝发错颜色了，我要换成下单的蓝色，不要退款。",
+    "expected": {"order_id": "EX20260701002", "request_type": "换货", "expected_solution": "颜色发错，要求换成蓝色猫窝"},
+    "solution_keywords": [["蓝色"], ["换"]]
+  },
+  {
+    "id": "repair",
+    "text": "订单 RP20260701003 的饮水机水泵不转了，希望安排维修，不换货。",
+    "expected": {"order_id": "RP20260701003", "request_type": "维修", "expected_solution": "饮水机水泵故障，要求维修"},
+    "solution_keywords": [["维修"]]
+  },
+  {
+    "id": "complaint-no-order",
+    "text": "你们客服态度太差，我要投诉！希望负责人给我一个解释。我没带订单号。",
+    "expected": {"order_id": null, "request_type": "投诉", "expected_solution": "投诉客服态度，希望负责人解释"},
+    "solution_keywords": [["解释", "说明"], ["负责人", "主管"]]
+  },
+  {
+    "id": "ambiguous-no-order",
+    "text": "买的东西感觉不太对，你们能帮我看看吗？我也没想好要怎么处理。",
+    "expected": {"order_id": null, "request_type": "其他", "expected_solution": "未明确"},
+    "solution_keywords": [["未明确"]]
+  }
+]

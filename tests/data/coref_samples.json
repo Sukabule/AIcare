@@ -1,0 +1,8 @@
+[
+  {"query":"订单1001的物流到哪了","expect_exact":"订单1001的物流到哪了"},
+  {"query":"这个能退吗","history":[{"role":"user","text":"查订单1001"},{"role":"assistant","text":"订单1001商品是猫爬架，已发货。"}],"expect_contains":["1001","退"]},
+  {"query":"还是想查它的物流","history":[{"role":"user","text":"订单1001能退吗"},{"role":"assistant","text":"退款申请需按政策处理。"}],"expect_contains":["1001","物流"]},
+  {"query":"MH-W40水箱多大","expect_exact":"MH-W40水箱多大"},
+  {"query":"它有多大","expect_exact":"它有多大"},
+  {"query":"另一单能退吗","history":[{"role":"user","text":"查订单1001"},{"role":"assistant","text":"已查订单1001。"}],"expect_exact":"另一单能退吗"}
+]

@@ -1,0 +1,11 @@
+name: default
+# Same directory and member identity as the former embedded etcd.
+data-dir: /var/lib/milvus/etcd
+listen-client-urls: http://0.0.0.0:2379
+advertise-client-urls: http://etcd:2379
+listen-peer-urls: http://localhost:2380
+initial-advertise-peer-urls: http://localhost:2380
+initial-cluster: default=http://localhost:2380
+quota-backend-bytes: 4294967296
+auto-compaction-mode: revision
+auto-compaction-retention: '1000'

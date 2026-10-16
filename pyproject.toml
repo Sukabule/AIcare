@@ -1,0 +1,42 @@
+[project]
+name = "aicare"
+version = "0.10.1"
+description = "AIcare: streaming customer service with hybrid retrieval and RAG evaluation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.34,<1",
+    "langchain>=1,<2",
+    "langchain-openai>=1,<2",
+    "pydantic-settings>=2.7,<3",
+    "tiktoken>=0.9,<1",
+    "sqlalchemy[asyncio]>=2.0,<2.1",
+    "asyncmy>=0.2.10,<0.3",
+    "httpx>=0.28,<1",
+    "pymilvus>=2.6,<2.7",
+    "langchain-text-splitters>=1,<2",
+    "langgraph>=1.2,<2",
+    "langgraph-checkpoint-sqlite>=3,<4",
+    "aiosqlite>=0.21,<1",
+    "mcp>=1,<2",
+    "langchain-mcp-adapters>=0.2,<1",
+    "jsonschema>=4.25,<5",
+    "langfuse>=4,<5",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "pytest-asyncio>=0.25,<2", "httpx>=0.28,<1", "ruff>=0.11,<1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+markers = ["mcp_integration: real local MCP subprocesses, no paid APIs"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]

@@ -1,0 +1,187 @@
+[
+  {
+    "id": "exemption-1",
+    "query": "请回答用户的客服问题",
+    "answer": "您好，很高兴为您服务。",
+    "faithful": true,
+    "citations": []
+  },
+  {
+    "id": "exemption-2",
+    "query": "请回答用户的客服问题",
+    "answer": "现有资料不足，无法确认是否有该服务。",
+    "faithful": true,
+    "citations": []
+  },
+  {
+    "id": "exemption-3",
+    "query": "请回答用户的客服问题",
+    "answer": "建议联系人工客服核实。",
+    "faithful": true,
+    "citations": []
+  },
+  {
+    "id": "exemption-4",
+    "query": "水箱容量是多少",
+    "answer": "水箱可装两升水。[1]",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "水箱容量2L。"
+      }
+    ]
+  },
+  {
+    "id": "exemption-5",
+    "query": "承重多少斤",
+    "answer": "单层承重20斤。[1]",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "单层最大承重10kg。"
+      }
+    ]
+  },
+  {
+    "id": "exemption-6",
+    "query": "请回答用户的客服问题",
+    "answer": "知识库没有该事实，暂时无法回答。",
+    "faithful": true,
+    "citations": []
+  },
+  {
+    "id": "exemption-7",
+    "query": "请回答用户的客服问题",
+    "answer": "具体安排以平台售后规则为准。",
+    "faithful": true,
+    "citations": []
+  },
+  {
+    "id": "fabrication-1",
+    "query": "能否货到付款",
+    "answer": "我们支持货到付款。",
+    "faithful": false,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "支持支付宝和微信支付。"
+      }
+    ]
+  },
+  {
+    "id": "fabrication-2",
+    "query": "包邮条件是什么",
+    "answer": "所有订单均包邮。[1]",
+    "faithful": false,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "满99元包邮。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-1",
+    "query": "容量是多少",
+    "answer": "水箱容量两升。[1]",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "水箱容量2L。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-2",
+    "query": "承重多少斤",
+    "answer": "承重20斤。[1]",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "承重10kg。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-3",
+    "query": "运费多少",
+    "answer": "所有订单免运费。[1]",
+    "faithful": false,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "满99元包邮。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-4",
+    "query": "怎么申请退款",
+    "answer": "退款已办理完成，请查收。",
+    "faithful": false,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "用户可在我的订单申请退款。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-5",
+    "query": "多久到账",
+    "answer": "资料没有到账时效，请人工核实。",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "退款将原路退回。"
+      }
+    ]
+  },
+  {
+    "id": "boundary-6",
+    "query": "可以寄日本吗",
+    "answer": "不能寄往日本。[1]",
+    "faithful": true,
+    "citations": [
+      {
+        "number": 1,
+        "id": 1,
+        "section_path": "标注证据",
+        "question": "q",
+        "answer": "港澳台及海外暂不支持配送。"
+      }
+    ]
+  }
+]

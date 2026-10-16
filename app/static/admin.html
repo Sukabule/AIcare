@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>管理首页 · AIcare</title>
+  
+  
+<link rel="stylesheet" href="/static/workspace.css?v=20261016">
+</head>
+<body class="admin-page">
+  <script src="/static/admin.js?v=20261014-3"></script>
+  <main>
+    <header class="page-head">
+      <div><h1>客服工作台</h1><p class="muted">整理知识、处理缺口，持续检查每一次回答。</p></div>
+      <a class="link-button" href="/">打开客服聊天</a>
+    </header>
+    <div id="modules" class="module-grid" aria-live="polite"></div>
+    <p class="workspace-footer">各模块独立显示状态。知识与审核数据来自本地数据库，评估读数来自已保存报告。</p>
+  </main>
+  <script>
+    const modules=[['知识库','/kb'],['审核队列','/review'],['RAG 评估','/rag-eval'],['观测与成本','/observability'],['问题池',null]];
+    const symbols={'知识库':'book','审核队列':'review','RAG 评估':'chart','观测与成本':'pulse','问题池':'chat'};
+    const states={ready:'可用',unavailable:'依赖不可用',needs_update:'待更新',no_report:'暂无报告',not_implemented:'未开放'};
+    function render(items) {
+      const root=document.getElementById('modules'); root.replaceChildren();
+      const order=new Map(modules.map(([name],index)=>[name,index]));
+      [...items].sort((a,b)=>(order.get(a.name)??99)-(order.get(b.name)??99)).forEach(m=>{
+        const card=document.createElement('section');
+        card.className='panel module'+(m.name==='知识库'?' featured':'')+(m.name==='观测与成本'?' observation':'')+(!m.path?' placeholder':'');
+        const heading=document.createElement('div');heading.className='module-title';
+        const symbol=document.createElement('span');symbol.className='module-symbol';symbol.innerHTML=AIcareDesign.icon(symbols[m.name]);
+        const title=document.createElement('h2');title.textContent=m.name;
+        const state=document.createElement('span');state.className='module-status';state.dataset.state=m.status||'loading';state.textContent=m.name==='RAG 评估'&&m.status==='ready'?'报告可读':states[m.status]||(m.status==='loading'?'读取中':'查看详情');
+        heading.append(symbol,title);
+        const p=document.createElement('p');p.className='muted';p.textContent=m.path?m.summary:'原话与知识缺口可在审核队列查看，独立问题池页面尚未开放。';
+        card.append(heading,state,p);
+        if(m.path){const a=document.createElement('a');a.className='link-button';a.href=m.path;a.textContent='打开'+m.name;card.append(a);}
+        root.append(card);
+      });
+    }
+    render(modules.map(([name,path])=>({name,path,status:path?'loading':'not_implemented',summary:'正在读取模块状态…'})));
+    fetch('/api/admin/overview').then(r=>{if(!r.ok)throw Error();return r.json();}).then(r=>render(r.modules)).catch(()=>render(modules.map(([name,path])=>({name,path,status:path?'unavailable':'not_implemented',summary:'读数暂时不可用，可进入模块检查服务状态。'}))));
+  </script>
+</body>
+</html>

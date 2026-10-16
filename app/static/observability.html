@@ -1,0 +1,9 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>观测与成本 · AIcare</title><script defer src="/static/admin.js?v=20261014-3"></script><script defer src="/static/ch09-dialog.js"></script><script defer src="/static/observability.js"></script>
+<link rel="stylesheet" href="/static/workspace.css?v=20261016">
+</head><body class="admin-page observability-page"><main>
+<header class="page-head"><div><h1>观测与成本</h1><p class="muted">意图 token 账、评估趋势和证据阈值，来自同一套运行记录。</p></div><div class="report-toolbar"><a id="langfuse" class="link-button" href="http://127.0.0.1:3000" target="_blank" rel="noopener">打开 Langfuse 链路</a><button id="refresh">刷新报表</button></div></header>
+<p id="notice" class="notice" role="status"></p><div class="reports">
+<section class="panel"><div class="panel-head"><h2>意图 token 账</h2><button data-job="cost-report">重跑意图成本账</button></div><p class="metric-note">统计实际模型 token，未配置模型单价。请求数按 trace 去重，同一请求的全部模型步骤合计。</p><div id="cost"></div></section>
+<section class="panel"><div class="panel-head"><h2>评估趋势</h2><button data-job="eval-flywheel">运行一轮评估</button></div><p class="metric-note">默认每桶 1 题，共 5 题；全量 300 题可在终端显式运行。样本规模不同的轮次不能直接比较。</p><div id="trend"></div></section>
+<section class="panel"><div class="panel-head"><h2>证据置信度校准</h2><button data-job="calibrate-confidence">重跑阈值校准</button></div><p class="metric-note">Top1 相关性、有效证据数、分差和关键条款共同计算；推荐阈值按真实标注样本分离度确定。</p><div id="calibration"></div></section>
+</div><section class="panel job-panel"><div class="panel-head"><h2>重跑日志</h2><button id="stop-job" disabled>停止当前作业</button></div><p id="job-state" class="muted">选择一个报表作业，日志会在这里更新。</p><pre id="job-log" class="log">尚未启动作业。</pre></section></main></body></html>

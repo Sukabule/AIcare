@@ -1,0 +1,58 @@
+name: aicare
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.23
+    command: ["etcd", "--config-file=/etc/etcd.yaml"]
+    volumes:
+      # Reuse the existing metadata directory; never initialize a replacement volume.
+      - milvus-data:/var/lib/milvus
+      - ./config/milvus-etcd.yaml:/etc/etcd.yaml:ro
+    healthcheck:
+      test: ["CMD", "etcdctl", "--endpoints=http://127.0.0.1:2379", "endpoint", "health"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  milvus:
+    image: milvusdb/milvus:v2.6.23
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "false"
+      ETCD_ENDPOINTS: etcd:2379
+      COMMON_STORAGETYPE: local
+      DEPLOY_MODE: STANDALONE
+    ports:
+      - "127.0.0.1:19530:19530"
+    volumes:
+      - milvus-data:/var/lib/milvus
+    depends_on:
+      etcd:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: aicare
+      MYSQL_USER: aicare
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/ch02-ddl.sql:/docker-entrypoint-initdb.d/01-ddl.sql:ro
+      - ./sql/ch02-seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -u aicare -D aicare -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  mysql-data:
+  milvus-data:

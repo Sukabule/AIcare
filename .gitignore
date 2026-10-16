@@ -1,0 +1,43 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python environments, caches and build output
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local runtime state (keep source knowledge and test fixtures)
+.cache/
+log/
+/data/*.db
+/data/*.db-*
+/data/checkpoints/
+/data/ch*/reports/
+/data/ch10/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local plans, implementation notes and organization records
+/docs/archive/
+/docs/plans/
+/docs/records/
+/docs/**/*-plan.md
+/docs/project-cleanup-*.md
+/docs/github-organization-*.md
+/docs/refactor-*.md
+/docs/frontend-design.md
