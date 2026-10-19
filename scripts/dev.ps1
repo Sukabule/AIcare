@@ -6,7 +6,7 @@ if (-not (Test-Path -LiteralPath '.env')) {
 }
 uv sync --locked
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-docker compose up -d --wait
+docker compose up -d --wait mysql milvus
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 uv run --no-sync python scripts/init_db.py
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

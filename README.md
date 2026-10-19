@@ -1,8 +1,8 @@
 # AIcare
 
-基于 LangGraph 与 RAG 的智能客服系统，集成流式对话、业务工具、知识库管理、人工审核和质量观测。
+基于 LangGraph Workflow、Agent 与 RAG 的智能客服系统，集成流式对话、业务工具、知识库管理、人工审核和质量观测。
 
-**版本：** `0.10.1` · **Python：** `3.12` · **部署方式：** 本机应用 + Docker 基础服务
+**版本：** `0.10.1` · **Python：** `3.12` · **部署方式：** Docker Compose（支持本机开发）
 
 [快速开始](#快速开始) · [项目结构](#项目结构) · [配置说明](#配置说明) · [开发文档](#开发文档)
 
@@ -72,7 +72,7 @@ flowchart LR
 
 ### 环境要求
 
-- Python 3.12 与 uv。
+- 纯 Docker 部署无需本机 Python；本机开发需要 Python 3.12 与 uv。
 - Docker Desktop / Docker Compose，且 Docker 已启动。
 - 可用的聊天、嵌入及重排服务配置。
 
@@ -96,7 +96,33 @@ if [ ! -f .env ]; then cp .env.example .env; fi
 
 编辑 `.env`，填写模型服务、数据库密码及连接串。字段说明见 [配置说明](#配置说明)，完整模板见 [.env.example](.env.example)。
 
-### 2. 启动应用
+### 2. 使用 Docker Compose 启动
+
+```bash
+docker compose up -d --build --wait
+docker compose ps
+```
+
+Compose 会构建 Python 镜像，启动 MySQL、etcd、Milvus 和两个 MCP 服务；`db-init` 成功应用 SQL 后才启动后端。首次构建需要下载镜像与锁定的 Python 依赖。
+
+后端默认发布到 `127.0.0.1:8000`，由 `.env` 中的 `APP_PORT` 控制；如果该端口被其他项目占用，可改为 `18000`，页面地址随之替换。
+
+修改 Python、提示词、前端或镜像内脚本后，重新构建并更新容器：
+
+```bash
+docker compose up -d --build --wait
+```
+
+只修改 `.env` 时执行 `docker compose up -d --wait`。`restart` 适合重启现有进程，不会更新镜像中的代码或重新注入环境变量。
+
+<details>
+<summary>本机开发：Python / uv 在宿主机运行</summary>
+
+本机开发另外需要 Python 3.12 与 uv。先停止容器后端，避免争用端口或会话检查点：
+
+```bash
+docker compose stop backend
+```
 
 **Windows PowerShell**
 
@@ -111,9 +137,9 @@ bash scripts/dev.sh
 # 已安装 make 时，也可运行 make dev
 ```
 
-启动脚本会安装锁定依赖、启动 MySQL / etcd / Milvus、应用 SQL 与种子数据、启动 MCP 服务，最后运行 FastAPI。
+开发脚本安装锁定依赖，只启动 MySQL / etcd / Milvus，应用 SQL，再启动本机 MCP 和 FastAPI。应用采用单 worker，未启用自动重载。返回容器模式前，在开发终端按 Ctrl+C 停止本机后端。
 
-应用默认监听 `127.0.0.1:8000`，采用单 worker，未启用自动重载。修改 Python、提示词或 `.env` 后需重启；静态页面修改后刷新浏览器即可。
+</details>
 
 ### 3. 访问页面
 
@@ -179,7 +205,9 @@ Windows 未安装 make 时：
 ├── .env.example          # 环境变量模板
 ├── CONTRIBUTING.md       # 贡献与验证指南
 ├── SECURITY.md           # 安全报告说明
-├── compose.yaml          # MySQL、Milvus、etcd
+├── Dockerfile            # Python 应用与 MCP 共用镜像
+├── .dockerignore         # 镜像构建白名单
+├── compose.yaml          # 后端、MCP、初始化与基础服务
 ├── docker-compose.langfuse.yml
 ├── Makefile              # 常用任务入口
 ├── pyproject.toml
@@ -195,6 +223,7 @@ Windows 未安装 make 时：
 | `CHAT_BASE_URL / CHAT_MODEL / CHAT_API_KEY` | 聊天模型地址、模型 ID 和密钥 |
 | `EMBED_* / RERANK_*` | 嵌入与重排服务 |
 | `MYSQL_ROOT_PASSWORD / MYSQL_PASSWORD` | Docker MySQL 初始化密码 |
+| `APP_PORT` | Compose 后端宿主端口，默认 `8000` |
 | `MYSQL_PORT` | MySQL 宿主端口，模板默认 `3306` |
 | `DATABASE_URL / TEST_DATABASE_URL` | 业务库和专用测试库连接串 |
 | `MILVUS_URI / MILVUS_COLLECTION` | 向量服务地址与集合 |
@@ -210,7 +239,8 @@ Windows 未安装 make 时：
 - `MYSQL_PORT` 与两条连接串的宿主端口需一致；若改用 `13306`，三处一起调整。容器内部仍使用 `3306`。
 - 连接串密码包含特殊字符时需 URL 编码。真实凭据只放入被 Git 忽略的 `.env`。
 - 基础 Compose 使用独立 etcd，MySQL 与 Milvus 数据通过命名卷持久化。
-- 迁移顺序以 [scripts/init_db.py](scripts/init_db.py) 为准，ORM 不使用 `create_all` 建表。
+- 迁移顺序以 [scripts/init_db.py](scripts/init_db.py) 为准；容器使用 `--direct` 直连初始化，本机默认通过 Docker CLI 初始化，ORM 不使用 `create_all` 建表。
+- Compose 使用 `DATABASE_HOST` / `DATABASE_PORT` 覆盖数据库端点，保留连接串中的账号和编码密码；Milvus / MCP 自动使用容器服务名。
 
 ## 常用命令
 
@@ -235,13 +265,17 @@ Windows 未安装 make 时：
 ### 服务管理
 
 ```bash
-# 查看基础容器
+# 启动或更新整套服务
+docker compose up -d --build --wait
 docker compose ps
+docker compose logs -f backend
 
-# MCP 服务启停与检查
+# 容器 MCP 检查与重启
+docker compose exec backend python scripts/mcp_services.py smoke
+docker compose restart mcp-logistics
+
+# 本机开发模式的 MCP 管理
 uv run python scripts/mcp_services.py up
-uv run python scripts/mcp_services.py smoke
-uv run python scripts/mcp_services.py restart --server logistics
 uv run python scripts/mcp_services.py down
 
 # 停止可选观测栈，保留数据卷

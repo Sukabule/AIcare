@@ -6,7 +6,7 @@ if [ ! -f .env ]; then
   echo '已创建 .env，请填写 CHAT_BASE_URL / CHAT_MODEL / CHAT_API_KEY。'
 fi
 uv sync --locked
-docker compose up -d --wait
+docker compose up -d --wait mysql milvus
 uv run --no-sync python scripts/init_db.py
 export TIKTOKEN_CACHE_DIR="${TIKTOKEN_CACHE_DIR:-$PWD/.cache/tiktoken}"
 uv run --no-sync python scripts/mcp_services.py up

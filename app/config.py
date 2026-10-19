@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import make_url
 
 
 class Settings(BaseSettings):
@@ -40,6 +41,22 @@ class Settings(BaseSettings):
     test_database_url: SecretStr = SecretStr(
         "mysql+asyncmy://aicare:configure-in-env@127.0.0.1:3306/aicare_test?charset=utf8mb4"
     )
+    # Compose overrides only the endpoint, retaining encoded URL credentials.
+    database_host: str = ""
+    database_port: int | None = Field(default=None, ge=1, le=65535)
+
+    @model_validator(mode="after")
+    def override_database_endpoint(self):
+        if self.database_host or self.database_port is not None:
+            for field in ("database_url", "test_database_url"):
+                url = make_url(getattr(self, field).get_secret_value())
+                url = url.set(
+                    host=self.database_host or url.host,
+                    port=self.database_port if self.database_port is not None else url.port,
+                )
+                setattr(self, field, SecretStr(url.render_as_string(hide_password=False)))
+        return self
+
     graph_checkpoint_path: Path = Path("data/checkpoints/conversations.sqlite")
     max_agent_steps: int = Field(default=6, ge=1, le=20)
     intent_model: str = ""

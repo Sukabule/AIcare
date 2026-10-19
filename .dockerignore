@@ -1,0 +1,20 @@
+# Allow only application code, locked dependencies and evaluation inputs.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!uv.lock
+!Makefile
+!app/
+!app/**
+!mcp_servers/
+!mcp_servers/**
+!scripts/
+!scripts/**
+!sql/
+!sql/**
+!tests/
+!tests/data/
+!tests/data/**
+**/__pycache__/
+**/*.py[cod]

@@ -1,4 +1,23 @@
 name: aicare
+
+x-app-build: &app-build
+  build:
+    context: .
+  init: true
+
+x-app-environment: &app-environment
+  # Preserve URL-encoded credentials while changing only the database endpoint.
+  DATABASE_HOST: mysql
+  DATABASE_PORT: "3306"
+  MILVUS_URI: http://milvus:19530
+  MCP_LOGISTICS_URL: http://mcp-logistics:8101/mcp
+  MCP_AFTERSALES_URL: http://mcp-aftersales:8102/mcp
+  KB_SOURCE_DIR: /app/knowledge
+  GRAPH_CHECKPOINT_PATH: data/checkpoints/conversations.sqlite
+  TIKTOKEN_CACHE_DIR: /app/.cache/tiktoken
+  # Optional Langfuse stack remains separate; use the host gateway from containers.
+  LANGFUSE_BASE_URL: ${DOCKER_LANGFUSE_BASE_URL:-http://host.docker.internal:3000}
+
 services:
   etcd:
     image: quay.io/coreos/etcd:v3.5.23
@@ -53,6 +72,80 @@ services:
       interval: 3s
       timeout: 3s
       retries: 30
+
+  db-init:
+    <<: *app-build
+    env_file: .env
+    environment: *app-environment
+    command: ["python", "scripts/init_db.py", "--direct"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: "no"
+
+  mcp-logistics:
+    <<: *app-build
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8101"
+    command: ["python", "-m", "mcp_servers.logistics_server"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8101/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  mcp-aftersales:
+    <<: *app-build
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8102"
+    command: ["python", "-m", "mcp_servers.aftersales_server"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8102/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    <<: *app-build
+    env_file: .env
+    environment: *app-environment
+    ports:
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
+    volumes:
+      - ./data:/app/data
+      - type: bind
+        source: ${KB_SOURCE_DIR:-./data/kb}
+        target: /app/knowledge
+        read_only: true
+        bind:
+          create_host_path: false
+      - ./log:/app/log
+      - ./.cache/tiktoken:/app/.cache/tiktoken
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      milvus:
+        condition: service_healthy
+      mcp-logistics:
+        condition: service_healthy
+      mcp-aftersales:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
 volumes:
   mysql-data:
   milvus-data:

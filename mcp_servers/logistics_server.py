@@ -4,13 +4,21 @@ import os
 import random
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 mcp = FastMCP(
     "logistics",
-    host="127.0.0.1",
+    host=os.getenv("MCP_HOST", "127.0.0.1"),
     port=int(os.getenv("MCP_PORT", "8101")),
     stateless_http=True,
     json_response=True,
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=["127.0.0.1:*", "localhost:*", "[::1]:*", "mcp-logistics:*"],
+        allowed_origins=["http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*"],
+    ),
 )
 
 
@@ -30,6 +38,11 @@ async def query_logistics(tracking_no: str) -> dict:
             {"time": "2026-10-11 07:30:00", "event": f"到达{location}"},
         ],
     }
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request: Request):
+    return JSONResponse({"status": "ok"})
 
 
 if __name__ == "__main__":

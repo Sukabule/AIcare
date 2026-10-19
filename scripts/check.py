@@ -17,6 +17,7 @@ TEST_FILES = (
     "test_ch08_engine.py",
     "test_pages.py",
     "test_removed_topics.py",
+    "test_container_config.py",
 )
 
 
